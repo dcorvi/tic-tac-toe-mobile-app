@@ -12,7 +12,9 @@ export default class App extends React.Component {
         [0, 0, 0],
         [0, 0, 0],
         [0, 0, 0]
-      ]
+      ],
+      player1Score: 0,
+      player2Score: 0,
     }
   }
 
@@ -34,21 +36,22 @@ export default class App extends React.Component {
     //  check win condition
     let winner = this.checkWinner();
 
+    let tie = this.checkTie();
+
+
     if (winner === 1) {
       alert('Player 1 wins!');
+      this.increaseScore(1);
       this.resetGame();
     } else if (winner === -1) {
       alert('Player 2 wins!');
+      this.increaseScore(2);
       this.resetGame();
-    }
-
-    // check tie condition
-    let tie = this.checkTie();
-
-    if (tie === true) {
+    } else if (tie === true) {
       alert('No more moves left, you have tied!');
       this.resetGame();
     }
+
   }
 
   displayCell = (row, col) => {
@@ -77,7 +80,7 @@ export default class App extends React.Component {
   checkWinner = () => {
     let grid = this.state.grid;
 
-    {console.log(grid)};
+    {console.log(grid)}
     // check rows for winner, return player number
     for (let i in grid) {
       let value = grid[i][0] + grid[i][1] + grid[i][2];
@@ -109,8 +112,22 @@ export default class App extends React.Component {
 
     // otherwise return 0
     return 0;
-
   }
+
+  increaseScore = (num) => {
+      let plyr = num;
+
+      let score1 = this.state.player1Score;
+      let score2 = this.state.player2Score;
+
+      if (plyr === 1) {score1++;}
+      else if (plyr === 2) {score2++;}
+
+      this.setState({ player1Score: score1 });
+      this.setState({ player2Score: score2 });
+      }
+
+
 
   resetGame = () => {
     this.setState({
@@ -123,16 +140,53 @@ export default class App extends React.Component {
     })
   }
 
+  resetScore = () => {
+    this.setState({
+      player1Score: 0,
+      player2Score: 0,
+    })
+  }
+
   render() {
     return (
       <View style={styles.container}>
+        <View style={{ flexDirection: 'row', paddingBottom: 50 }}>
+            <View style={ {
+              width: 80,
+              height: 80,
+              borderWidth: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 5,
+              margin: 10}}>
+              <Text >
+              Player 1 Score: {this.state.player1Score}
+              </Text>
+            </View>
+
+            <View style={{
+              width: 80,
+              height: 80,
+              borderWidth: 1,
+              alignItems: 'center',
+              justifyContent: 'center',
+              padding: 5,
+              margin: 10}}>
+              <Text>
+              Player 2 Score: {this.state.player2Score}
+              </Text>
+            </View>
+
+          </View>
+
 
       {/* show current players turn */}
-
-      <View style={{ paddingBottom: 50 }}>
-        <Text style={styles.turnHeader}>
-          Turn: Player {(this.state.currentPlayer === 1) ? 1 : 2}
-        </Text>
+      <View style={{ paddingBottom: 40 }}>
+        <View style={{flexDirection: 'row'}}>
+          <Text style={styles.turnHeader}>Turn: </Text>
+          <Text style={[styles.turnHeader, this.state.currentPlayer === 1 ? {color: 'red'} : {color: 'green'}]}> Player {(this.state.currentPlayer === 1) ? 1 : 2}
+          </Text>
+        </View>
       </View>
         <View style={{ flexDirection: 'row' }}>
           <TouchableOpacity
@@ -210,13 +264,19 @@ export default class App extends React.Component {
         </View>
 
         {/* Create view with padding for reset button */}
-        <View style={{ paddingTop: 50, width: 200 }}>
+        <View style={{ paddingTop: 40, width: 200 }}>
         <Button
           title="Reset Game"
           onPress={this.resetGame}
         />
         </View>
-
+        {/* Create view with padding for reset score button */}
+        <View style={{ paddingTop: 10, width: 200 }}>
+        <Button
+          title="Reset Score"
+          onPress={this.resetScore}
+        />
+        </View>
 
 
       </View>
@@ -240,7 +300,7 @@ const styles = StyleSheet.create({
   },
   tileX: {
     color: 'red',
-    fontSize: 70,
+    fontSize: 90,
   },
   tileO: {
     color: 'green',
